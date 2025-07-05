@@ -1,9 +1,13 @@
 package com.example.mop_calculator
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "shift_entries")
+@Entity(
+    tableName = "shift_entries",
+    indices = [Index(value = ["date", "type", "shift"], unique = true)]
+)
 data class ShiftEntry(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,

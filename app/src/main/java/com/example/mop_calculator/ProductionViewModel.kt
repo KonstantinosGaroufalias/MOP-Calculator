@@ -1,6 +1,7 @@
 package com.example.mop_calculator
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -37,6 +38,8 @@ class ProductionViewModel(
                 val dateString = date.format(DateTimeFormatter.ISO_LOCAL_DATE)
                 val shifts = dao.getDayShifts(dateString, type)
 
+                Log.d("ProductionViewModel", "Loading day $dateString for type $type: found ${shifts.size} shifts")
+
                 var morning = 0
                 var morningHours = 0.0
                 var afternoon = 0
@@ -45,6 +48,7 @@ class ProductionViewModel(
                 var nightHours = 0.0
 
                 shifts.forEach { shift ->
+                    Log.d("ProductionViewModel", "Shift: ${shift.shift} = ${shift.quantity}, ${shift.hours}h")
                     when (shift.shift) {
                         "ΠΡΩΙ" -> {
                             morning = shift.quantity
@@ -65,33 +69,25 @@ class ProductionViewModel(
                 val totalHours = morningHours + afternoonHours + nightHours
                 val mop = if (totalHours > 0) total / totalHours else 0.0
 
-                dayLive.postValue(
-                    DayStats(
-                        morning = morning,
-                        morningHours = morningHours,
-                        afternoon = afternoon,
-                        afternoonHours = afternoonHours,
-                        night = night,
-                        nightHours = nightHours,
-                        total = total,
-                        totalHours = totalHours,
-                        mop = mop
-                    )
+                val stats = DayStats(
+                    morning = morning,
+                    morningHours = morningHours,
+                    afternoon = afternoon,
+                    afternoonHours = afternoonHours,
+                    night = night,
+                    nightHours = nightHours,
+                    total = total,
+                    totalHours = totalHours,
+                    mop = mop
                 )
+
+                Log.d("ProductionViewModel", "Posted stats: $stats")
+                dayLive.postValue(stats)
+
             } catch (e: Exception) {
-                e.printStackTrace()
+                Log.e("ProductionViewModel", "Error loading day", e)
                 dayLive.postValue(
-                    DayStats(
-                        morning = 0,
-                        morningHours = 0.0,
-                        afternoon = 0,
-                        afternoonHours = 0.0,
-                        night = 0,
-                        nightHours = 0.0,
-                        total = 0,
-                        totalHours = 0.0,
-                        mop = 0.0
-                    )
+                    DayStats(0, 0.0, 0, 0.0, 0, 0.0, 0, 0.0, 0.0)
                 )
             }
         }
@@ -101,19 +97,30 @@ class ProductionViewModel(
         viewModelScope.launch {
             try {
                 val dateString = date.format(DateTimeFormatter.ISO_LOCAL_DATE)
-                val entry = ShiftEntry(
-                    date = dateString,
-                    type = type,
-                    shift = shift,
-                    quantity = qty,
-                    hours = hours
-                )
-                dao.insertOrUpdate(entry)
 
-                // Reload after save
+                Log.d("ProductionViewModel", "Saving shift: $dateString, $type, $shift = $qty, ${hours}h")
+
+                // Delete existing entry first
+                dao.deleteShift(dateString, type, shift)
+
+                // Insert new entry if values are not zero
+                if (qty > 0 || hours > 0) {
+                    val entry = ShiftEntry(
+                        date = dateString,
+                        type = type,
+                        shift = shift,
+                        quantity = qty,
+                        hours = hours
+                    )
+                    dao.insertOrReplace(entry)
+                    Log.d("ProductionViewModel", "Inserted entry: $entry")
+                }
+
+                // Reload data immediately
                 loadDay(date)
+
             } catch (e: Exception) {
-                e.printStackTrace()
+                Log.e("ProductionViewModel", "Error saving shift", e)
             }
         }
     }
@@ -122,7 +129,7 @@ class ProductionViewModel(
         viewModelScope.launch {
             try {
                 val shifts = dao.getMonthShifts(yearMonth, type)
-                val dailyData = mutableMapOf<String, Pair<Int, Double>>() // production to hours
+                val dailyData = mutableMapOf<String, Pair<Int, Double>>()
 
                 shifts.forEach { shift ->
                     val current = dailyData[shift.date] ?: Pair(0, 0.0)
@@ -139,7 +146,7 @@ class ProductionViewModel(
 
                 monthLive.postValue(MonthStats(dailyMOP, monthMOP))
             } catch (e: Exception) {
-                e.printStackTrace()
+                Log.e("ProductionViewModel", "Error loading month", e)
                 monthLive.postValue(MonthStats(emptyList(), 0.0))
             }
         }

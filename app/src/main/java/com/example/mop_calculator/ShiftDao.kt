@@ -4,24 +4,18 @@ import androidx.room.*
 
 @Dao
 interface ShiftDao {
-    @Query("DELETE FROM shift_entries WHERE date = :date AND type = :type AND shift = :shift")
-    suspend fun deleteExisting(date: String, type: String, shift: String)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertOrReplace(entry: ShiftEntry)
 
-    @Insert
-    suspend fun insertNew(entry: ShiftEntry)
-
-    @Transaction
-    suspend fun insertOrUpdate(entry: ShiftEntry) {
-        deleteExisting(entry.date, entry.type, entry.shift)
-        insertNew(entry)
-    }
-
-    @Query("SELECT * FROM shift_entries WHERE date = :date AND type = :type")
+    @Query("SELECT * FROM shift_entries WHERE date = :date AND type = :type ORDER BY shift")
     suspend fun getDayShifts(date: String, type: String): List<ShiftEntry>
 
-    @Query("SELECT * FROM shift_entries WHERE date LIKE :month || '%' AND type = :type")
+    @Query("SELECT * FROM shift_entries WHERE date LIKE :month || '%' AND type = :type ORDER BY date")
     suspend fun getMonthShifts(month: String, type: String): List<ShiftEntry>
 
-    @Query("SELECT * FROM shift_entries WHERE date = :date")
+    @Query("SELECT * FROM shift_entries WHERE date = :date ORDER BY type, shift")
     suspend fun getAllDayShifts(date: String): List<ShiftEntry>
+
+    @Query("DELETE FROM shift_entries WHERE date = :date AND type = :type AND shift = :shift")
+    suspend fun deleteShift(date: String, type: String, shift: String)
 }

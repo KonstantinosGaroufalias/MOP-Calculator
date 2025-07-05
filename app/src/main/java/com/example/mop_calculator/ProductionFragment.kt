@@ -1,6 +1,7 @@
 package com.example.mop_calculator
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,6 +9,7 @@ import android.widget.Button
 import android.widget.CalendarView
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import java.time.LocalDate
@@ -66,11 +68,14 @@ class ProductionFragment : Fragment() {
         // Calendar date change listener
         calendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->
             selectedDate = LocalDate.of(year, month + 1, dayOfMonth)
+            Log.d("ProductionFragment", "Date changed to: $selectedDate")
             viewModel.loadDay(selectedDate)
         }
 
         // Save button click listener
         saveBtn.setOnClickListener {
+            Log.d("ProductionFragment", "Save button clicked")
+
             val morning = morningInput.text.toString().toIntOrNull() ?: 0
             val morningHours = morningHoursInput.text.toString().toDoubleOrNull() ?: 0.0
 
@@ -80,23 +85,42 @@ class ProductionFragment : Fragment() {
             val night = nightInput.text.toString().toIntOrNull() ?: 0
             val nightHours = nightHoursInput.text.toString().toDoubleOrNull() ?: 0.0
 
+            Log.d("ProductionFragment", "Saving: Morning=$morning/${morningHours}h, Afternoon=$afternoon/${afternoonHours}h, Night=$night/${nightHours}h")
+
             // Save all shifts
             viewModel.saveShift(selectedDate, "ΠΡΩΙ", morning, morningHours)
             viewModel.saveShift(selectedDate, "ΑΠΟΓ", afternoon, afternoonHours)
             viewModel.saveShift(selectedDate, "ΒΡΑΔ", night, nightHours)
+
+            // Show confirmation
+            Toast.makeText(context, "Αποθηκεύτηκε!", Toast.LENGTH_SHORT).show()
         }
 
         // Observe day stats
         viewModel.dayLive.observe(viewLifecycleOwner) { stats ->
-            // Update production inputs
-            morningInput.setText(if (stats.morning > 0) stats.morning.toString() else "")
-            afternoonInput.setText(if (stats.afternoon > 0) stats.afternoon.toString() else "")
-            nightInput.setText(if (stats.night > 0) stats.night.toString() else "")
+            Log.d("ProductionFragment", "Received stats: $stats")
+
+            // Update production inputs (only if they're different to avoid cursor jumps)
+            if (morningInput.text.toString() != stats.morning.toString() || stats.morning == 0) {
+                morningInput.setText(if (stats.morning > 0) stats.morning.toString() else "")
+            }
+            if (afternoonInput.text.toString() != stats.afternoon.toString() || stats.afternoon == 0) {
+                afternoonInput.setText(if (stats.afternoon > 0) stats.afternoon.toString() else "")
+            }
+            if (nightInput.text.toString() != stats.night.toString() || stats.night == 0) {
+                nightInput.setText(if (stats.night > 0) stats.night.toString() else "")
+            }
 
             // Update hours inputs
-            morningHoursInput.setText(if (stats.morningHours > 0) stats.morningHours.toString() else "")
-            afternoonHoursInput.setText(if (stats.afternoonHours > 0) stats.afternoonHours.toString() else "")
-            nightHoursInput.setText(if (stats.nightHours > 0) stats.nightHours.toString() else "")
+            if (morningHoursInput.text.toString() != stats.morningHours.toString() || stats.morningHours == 0.0) {
+                morningHoursInput.setText(if (stats.morningHours > 0) stats.morningHours.toString() else "")
+            }
+            if (afternoonHoursInput.text.toString() != stats.afternoonHours.toString() || stats.afternoonHours == 0.0) {
+                afternoonHoursInput.setText(if (stats.afternoonHours > 0) stats.afternoonHours.toString() else "")
+            }
+            if (nightHoursInput.text.toString() != stats.nightHours.toString() || stats.nightHours == 0.0) {
+                nightHoursInput.setText(if (stats.nightHours > 0) stats.nightHours.toString() else "")
+            }
 
             // Update results
             totalText.text = getString(R.string.total_fmt, stats.total)
