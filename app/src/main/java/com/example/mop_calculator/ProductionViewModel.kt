@@ -38,29 +38,42 @@ class ProductionViewModel(
                 val shifts = dao.getDayShifts(dateString, type)
 
                 var morning = 0
+                var morningHours = 0.0
                 var afternoon = 0
+                var afternoonHours = 0.0
                 var night = 0
+                var nightHours = 0.0
 
                 shifts.forEach { shift ->
                     when (shift.shift) {
-                        "ΠΡΩΙ" -> morning = shift.quantity
-                        "ΑΠΟΓ" -> afternoon = shift.quantity
-                        "ΒΡΑΔ" -> night = shift.quantity
+                        "ΠΡΩΙ" -> {
+                            morning = shift.quantity
+                            morningHours = shift.hours
+                        }
+                        "ΑΠΟΓ" -> {
+                            afternoon = shift.quantity
+                            afternoonHours = shift.hours
+                        }
+                        "ΒΡΑΔ" -> {
+                            night = shift.quantity
+                            nightHours = shift.hours
+                        }
                     }
                 }
 
                 val total = morning + afternoon + night
-                val avg = if (total > 0) total / 3.0 else 0.0
+                val totalHours = morningHours + afternoonHours + nightHours
+                val mop = if (totalHours > 0) total / totalHours else 0.0
 
-                dayLive.postValue(DayStats(morning, afternoon, night, total, avg))
+                dayLive.postValue(DayStats(morning, morningHours, afternoon, afternoonHours, night, nightHours, total, totalHours, mop))
             } catch (e: Exception) {
                 e.printStackTrace()
-                dayLive.postValue(DayStats(0, 0, 0, 0, 0.0))
+                dayLive.postValue(DayStats(0, 0.0, 0, 0.0, 0, 0.0, 0, 0.0, 0.0))
             }
         }
     }
 
-    fun saveShift(date: LocalDate, shift: String, qty: Int) {
+    fun saveShift(date: LocalDate, shift: String, qty: Int, hours: Double) {
         viewModelScope.launch {
             try {
                 val dateString = date.format(DateTimeFormatter.ISO_LOCAL_DATE)
@@ -68,9 +81,13 @@ class ProductionViewModel(
                     date = dateString,
                     type = type,
                     shift = shift,
-                    quantity = qty
+                    quantity = qty,
+                    hours = hours
                 )
                 dao.insertOrUpdate(entry)
+
+                // FIXED: Reload after save to prevent disappearing data
+                loadDay(date)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -81,17 +98,22 @@ class ProductionViewModel(
         viewModelScope.launch {
             try {
                 val shifts = dao.getMonthShifts(yearMonth, type)
-                val dailyTotals = mutableMapOf<String, Int>()
+                val dailyData = mutableMapOf<String, Pair<Int, Double>>() // production to hours
 
                 shifts.forEach { shift ->
-                    val currentTotal = dailyTotals[shift.date] ?: 0
-                    dailyTotals[shift.date] = currentTotal + shift.quantity
+                    val current = dailyData[shift.date] ?: Pair(0, 0.0)
+                    dailyData[shift.date] = Pair(
+                        current.first + shift.quantity,
+                        current.second + shift.hours
+                    )
                 }
 
-                val averages = dailyTotals.values.map { it / 3.0 }
-                val monthAvg = if (averages.isNotEmpty()) averages.average() else 0.0
+                val dailyMOP = dailyData.values.map { (prod, hrs) ->
+                    if (hrs > 0) prod / hrs else 0.0
+                }
+                val monthMOP = if (dailyMOP.isNotEmpty()) dailyMOP.average() else 0.0
 
-                monthLive.postValue(MonthStats(averages, monthAvg))
+                monthLive.postValue(MonthStats(dailyMOP, monthMOP))
             } catch (e: Exception) {
                 e.printStackTrace()
                 monthLive.postValue(MonthStats(emptyList(), 0.0))

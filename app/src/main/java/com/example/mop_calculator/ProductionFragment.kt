@@ -47,12 +47,21 @@ class ProductionFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val calendarView = view.findViewById<CalendarView>(R.id.calendarView)
+
+        // Production inputs
         val morningInput = view.findViewById<EditText>(R.id.inputMorning)
         val afternoonInput = view.findViewById<EditText>(R.id.inputAfternoon)
         val nightInput = view.findViewById<EditText>(R.id.inputNight)
+
+        // Hours inputs
+        val morningHoursInput = view.findViewById<EditText>(R.id.inputMorningHours)
+        val afternoonHoursInput = view.findViewById<EditText>(R.id.inputAfternoonHours)
+        val nightHoursInput = view.findViewById<EditText>(R.id.inputNightHours)
+
         val saveBtn = view.findViewById<Button>(R.id.saveBtn)
         val totalText = view.findViewById<TextView>(R.id.totalText)
-        val avgText = view.findViewById<TextView>(R.id.avgText)
+        val totalHoursText = view.findViewById<TextView>(R.id.totalHoursText)
+        val mopText = view.findViewById<TextView>(R.id.mopText)
 
         // Calendar date change listener
         calendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->
@@ -63,25 +72,41 @@ class ProductionFragment : Fragment() {
         // Save button click listener
         saveBtn.setOnClickListener {
             val morning = morningInput.text.toString().toIntOrNull() ?: 0
+            val morningHours = morningHoursInput.text.toString().toDoubleOrNull() ?: 0.0
+
             val afternoon = afternoonInput.text.toString().toIntOrNull() ?: 0
+            val afternoonHours = afternoonHoursInput.text.toString().toDoubleOrNull() ?: 0.0
+
             val night = nightInput.text.toString().toIntOrNull() ?: 0
+            val nightHours = nightHoursInput.text.toString().toDoubleOrNull() ?: 0.0
 
-            viewModel.saveShift(selectedDate, "ΠΡΩΙ", morning)
-            viewModel.saveShift(selectedDate, "ΑΠΟΓ", afternoon)
-            viewModel.saveShift(selectedDate, "ΒΡΑΔ", night)
+            // Save all shifts
+            viewModel.saveShift(selectedDate, "ΠΡΩΙ", morning, morningHours)
+            viewModel.saveShift(selectedDate, "ΑΠΟΓ", afternoon, afternoonHours)
+            viewModel.saveShift(selectedDate, "ΒΡΑΔ", night, nightHours)
 
-            // Reload data to update UI
-            viewModel.loadDay(selectedDate)
+            // Data will reload automatically due to fixed ViewModel
         }
 
         // Observe day stats
-        viewModel.dayLive.observe(viewLifecycleOwner) {stats ->
+        viewModel.dayLive.observe(viewLifecycleOwner) { stats ->
+            // Update production inputs
             morningInput.setText(if (stats.morning > 0) stats.morning.toString() else "")
             afternoonInput.setText(if (stats.afternoon > 0) stats.afternoon.toString() else "")
             nightInput.setText(if (stats.night > 0) stats.night.toString() else "")
 
+            // Update hours inputs
+            morningHoursInput.setText(if (stats.morningHours > 0) stats.morningHours.toString() else "")
+            afternoonHoursInput.setText(if (stats.afternoonHours > 0) stats.afternoonHours.toString() else "")
+            nightHoursInput.setText(if (stats.nightHours > 0) stats.nightHours.toString() else "")
+
+            // Update results
             totalText.text = getString(R.string.total_fmt, stats.total)
-            avgText.text = getString(R.string.avg_fmt, stats.avg)
+            totalHoursText.text = getString(R.string.total_hours_fmt, stats.totalHours)
+            mopText.text = getString(R.string.mop_fmt, stats.mop)
         }
+
+        // Load current day data
+        viewModel.loadDay(selectedDate)
     }
 }

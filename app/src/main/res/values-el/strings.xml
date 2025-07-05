@@ -1,13 +1,19 @@
 <resources>
-    <string name="app_name">Υπολογιστής Μ.Ο.Π.</string>
+    <string name="app_name">MOP Calculator</string>
     <string name="tab_2f">2Φ</string>
     <string name="tab_3f">3Φ</string>
+    <string name="tab_summary">Σύνολο</string>
     <string name="shift_morning">Πρωϊνή Βάρδια</string>
     <string name="shift_afternoon">Απογευματινή Βάρδια</string>
     <string name="shift_night">Βραδυνή Βάρδια</string>
     <string name="save">Αποθήκευση</string>
+    <string name="production">Παραγωγή</string>
+    <string name="working_hours">Ώρες Εργασίας</string>
     <string name="enter_quantity">Εισάγετε ποσότητα</string>
+    <string name="enter_hours">Εισάγετε ώρες</string>
     <string name="total_fmt">Σύνολο: %1$d</string>
-    <string name="avg_fmt">Μ.Ο.Π.: %.1f</string>
+    <string name="total_hours_fmt">Σύνολο Ωρών: %.1f</string>
+    <string name="mop_fmt">Μ.Ο.Π.: %.2f</string>
+    <string name="final_mop_fmt">Τελικό Μ.Ο.Π.: %.2f</string>
     <string name="monthly_stats">Μηνιαία Στατιστικά</string>
 </resources>
