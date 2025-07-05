@@ -54,21 +54,25 @@ class StatsFragment : Fragment() {
             val statsDisplay = buildString {
                 append("📊 Στατιστικά ${type} για ${getMonthName(currentMonth)}\n\n")
 
-                append("🔢 Μέσος Όρος Μήνα: ${String.format("%.1f", monthStats.monthAvg)}\n\n")
+                append("🔢 Μέσος Όρος Μήνα: ${String.format("%.2f", monthStats.monthMOP)}\n\n")
 
-                append("📈 Καθημερινοί Μέσοι Όροι:\n")
-                if (monthStats.dailyAverages.isNotEmpty()) {
-                    monthStats.dailyAverages.forEachIndexed { index, avg ->
-                        append("Ημέρα ${index + 1}: ${String.format("%.1f", avg)}\n")
+                append("📈 Καθημερινοί Μ.Ο.Π.:\n")
+                if (monthStats.dailyMOP.isNotEmpty()) {
+                    monthStats.dailyMOP.forEachIndexed { index, mop ->
+                        append("Ημέρα ${index + 1}: ${String.format("%.2f", mop)}\n")
                     }
                 } else {
                     append("Δεν υπάρχουν δεδομένα για τον τρέχοντα μήνα.\n")
                 }
 
                 append("\n📋 Συνολικές Πληροφορίες:\n")
-                append("• Ημέρες με δεδομένα: ${monthStats.dailyAverages.size}\n")
-                append("• Μέγιστος Μ.Ο.: ${String.format("%.1f", monthStats.dailyAverages.maxOrNull() ?: 0.0)}\n")
-                append("• Ελάχιστος Μ.Ο.: ${String.format("%.1f", monthStats.dailyAverages.minOrNull() ?: 0.0)}\n")
+                append("• Ημέρες με δεδομένα: ${monthStats.dailyMOP.size}\n")
+                append("• Μέγιστος Μ.Ο.Π.: ${String.format("%.2f", monthStats.dailyMOP.maxOrNull() ?: 0.0)}\n")
+                append("• Ελάχιστος Μ.Ο.Π.: ${String.format("%.2f", monthStats.dailyMOP.minOrNull() ?: 0.0)}\n")
+
+                if (monthStats.monthMOP == 0.0) {
+                    append("\n💡 Εισάγετε παραγωγή και ώρες στην καρτέλα ${type}\n")
+                }
             }
 
             statsText.text = statsDisplay
@@ -77,18 +81,18 @@ class StatsFragment : Fragment() {
 
     private fun getMonthName(yearMonth: String): String {
         return when (yearMonth.substring(5)) {
-            "01" -> "Ιανουάριος"
-            "02" -> "Φεβρουάριος"
-            "03" -> "Μάρτιος"
-            "04" -> "Απρίλιος"
-            "05" -> "Μάιος"
-            "06" -> "Ιούνιος"
-            "07" -> "Ιούλιος"
-            "08" -> "Αύγουστος"
-            "09" -> "Σεπτέμβριος"
-            "10" -> "Οκτώβριος"
-            "11" -> "Νοέμβριος"
-            "12" -> "Δεκέμβριος"
+            "01" -> "Ιανουάριος ${yearMonth.substring(0, 4)}"
+            "02" -> "Φεβρουάριος ${yearMonth.substring(0, 4)}"
+            "03" -> "Μάρτιος ${yearMonth.substring(0, 4)}"
+            "04" -> "Απρίλιος ${yearMonth.substring(0, 4)}"
+            "05" -> "Μάιος ${yearMonth.substring(0, 4)}"
+            "06" -> "Ιούνιος ${yearMonth.substring(0, 4)}"
+            "07" -> "Ιούλιος ${yearMonth.substring(0, 4)}"
+            "08" -> "Αύγουστος ${yearMonth.substring(0, 4)}"
+            "09" -> "Σεπτέμβριος ${yearMonth.substring(0, 4)}"
+            "10" -> "Οκτώβριος ${yearMonth.substring(0, 4)}"
+            "11" -> "Νοέμβριος ${yearMonth.substring(0, 4)}"
+            "12" -> "Δεκέμβριος ${yearMonth.substring(0, 4)}"
             else -> yearMonth
         }
     }

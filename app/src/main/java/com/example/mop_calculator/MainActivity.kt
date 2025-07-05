@@ -18,13 +18,15 @@ class MainActivity : AppCompatActivity() {
         val tabLayout = findViewById<TabLayout>(R.id.tabLayout)
 
         val adapter = object : FragmentStateAdapter(this) {
-            override fun getItemCount() = 3  // 2F, 3F, Summary
+            override fun getItemCount() = 5  // 2F, 3F, Summary, Stats 2F, Stats 3F
 
             override fun createFragment(position: Int): Fragment {
                 return when (position) {
                     0 -> ProductionFragment.newInstance("2F")
                     1 -> ProductionFragment.newInstance("3F")
                     2 -> SummaryFragment.newInstance()
+                    3 -> StatsFragment.newInstance("2F")
+                    4 -> StatsFragment.newInstance("3F")
                     else -> ProductionFragment.newInstance("2F")
                 }
             }
@@ -36,6 +38,8 @@ class MainActivity : AppCompatActivity() {
                 0 -> getString(R.string.tab_2f)
                 1 -> getString(R.string.tab_3f)
                 2 -> getString(R.string.tab_summary)
+                3 -> "📊 2Φ"
+                4 -> "📊 3Φ"
                 else -> "Tab"
             }
         }.attach()

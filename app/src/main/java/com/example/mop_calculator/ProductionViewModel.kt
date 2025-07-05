@@ -65,10 +65,34 @@ class ProductionViewModel(
                 val totalHours = morningHours + afternoonHours + nightHours
                 val mop = if (totalHours > 0) total / totalHours else 0.0
 
-                dayLive.postValue(DayStats(morning, morningHours, afternoon, afternoonHours, night, nightHours, total, totalHours, mop))
+                dayLive.postValue(
+                    DayStats(
+                        morning = morning,
+                        morningHours = morningHours,
+                        afternoon = afternoon,
+                        afternoonHours = afternoonHours,
+                        night = night,
+                        nightHours = nightHours,
+                        total = total,
+                        totalHours = totalHours,
+                        mop = mop
+                    )
+                )
             } catch (e: Exception) {
                 e.printStackTrace()
-                dayLive.postValue(DayStats(0, 0.0, 0, 0.0, 0, 0.0, 0, 0.0, 0.0))
+                dayLive.postValue(
+                    DayStats(
+                        morning = 0,
+                        morningHours = 0.0,
+                        afternoon = 0,
+                        afternoonHours = 0.0,
+                        night = 0,
+                        nightHours = 0.0,
+                        total = 0,
+                        totalHours = 0.0,
+                        mop = 0.0
+                    )
+                )
             }
         }
     }
@@ -86,7 +110,7 @@ class ProductionViewModel(
                 )
                 dao.insertOrUpdate(entry)
 
-                // FIXED: Reload after save to prevent disappearing data
+                // Reload after save
                 loadDay(date)
             } catch (e: Exception) {
                 e.printStackTrace()

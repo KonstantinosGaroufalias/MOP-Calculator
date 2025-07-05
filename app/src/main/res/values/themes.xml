@@ -1,4 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Main App Theme -->
     <style name="Theme.MOPCalculator" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryVariant">@color/primary</item>
@@ -10,8 +11,21 @@
         <item name="android:statusBarColor" tools:targetApi="l">@color/background</item>
     </style>
 
-    <style name="CalendarTheme" parent="ThemeOverlay.MaterialComponents.Dark">
+    <!-- Custom Calendar Theme -->
+    <style name="CustomCalendarTheme" parent="Theme.MaterialComponents.DayNight">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textColorPrimary">@color/white</item>
+        <item name="android:textColorSecondary">@color/white</item>
         <item name="colorAccent">@color/primary</item>
-        <item name="android:textColorPrimary">@color/onBackground</item>
+        <item name="colorPrimary">@color/primary</item>
+        <item name="android:colorBackground">@color/background</item>
+        <item name="android:colorControlActivated">@color/primary</item>
+        <item name="android:colorControlHighlight">@color/primary</item>
+    </style>
+
+    <!-- Alternative Simple Calendar Theme -->
+    <style name="SimpleCalendarTheme" parent="android:Theme.Material">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textColorPrimary">@color/white</item>
     </style>
 </resources>

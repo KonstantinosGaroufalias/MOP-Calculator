@@ -84,8 +84,6 @@ class ProductionFragment : Fragment() {
             viewModel.saveShift(selectedDate, "ΠΡΩΙ", morning, morningHours)
             viewModel.saveShift(selectedDate, "ΑΠΟΓ", afternoon, afternoonHours)
             viewModel.saveShift(selectedDate, "ΒΡΑΔ", night, nightHours)
-
-            // Data will reload automatically due to fixed ViewModel
         }
 
         // Observe day stats

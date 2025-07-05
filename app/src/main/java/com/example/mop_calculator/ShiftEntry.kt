@@ -11,5 +11,5 @@ data class ShiftEntry(
     val type: String, // "2F" or "3F"
     val shift: String, // "ΠΡΩΙ", "ΑΠΟΓ", "ΒΡΑΔ"
     val quantity: Int,
-    val hours: Double = 0.0  // NEW: Hours worked
+    val hours: Double = 0.0
 )
