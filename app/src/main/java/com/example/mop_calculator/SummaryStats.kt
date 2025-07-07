@@ -7,5 +7,6 @@ data class SummaryStats(
     val total3F: Int,
     val totalHours3F: Double,
     val mop3F: Double,
-    val finalMOP: Double  // (mop2F + mop3F) / 2
+    val finalMOP: Double,  // (mop2F + mop3F) / 2
+    val monthlyMOP: Double  // NEW: Μηνιαίο Μ.Ο.Π.
 )

@@ -63,8 +63,13 @@ class SummaryFragment : Fragment() {
                 append("• Ώρες: ${String.format("%.1f", stats.totalHours3F)}\n")
                 append("• Μ.Ο.Π.: ${String.format("%.2f", stats.mop3F)}\n\n")
 
-                append("⭐ ΤΕΛΙΚΟ Μ.Ο.Π.:\n")
+                append("⭐ ΤΕΛΙΚΟ Μ.Ο.Π. ΗΜΕΡΑΣ:\n")
                 append("${String.format("%.2f", stats.finalMOP)}\n\n")
+
+                // NEW: Monthly MOP display
+                append("📅 ΜΗΝΙΑΙΟ Μ.Ο.Π.:\n")
+                append("${String.format("%.2f", stats.monthlyMOP)}\n")
+                append("(Μέσος όρος από 1/${selectedDate.monthValue} έως ${selectedDate.dayOfMonth}/${selectedDate.monthValue})\n\n")
 
                 append("📈 ΣΥΝΟΛΙΚΑ:\n")
                 append("• Παραγωγή: ${stats.total2F + stats.total3F}\n")
@@ -72,6 +77,10 @@ class SummaryFragment : Fragment() {
 
                 if (stats.finalMOP == 0.0) {
                     append("\n💡 Εισάγετε δεδομένα στις καρτέλες 2Φ και 3Φ\n")
+                }
+
+                if (stats.monthlyMOP == 0.0 && stats.finalMOP > 0.0) {
+                    append("\n📊 Το μηνιαίο Μ.Ο.Π. θα υπολογιστεί όταν υπάρχουν περισσότερες ημέρες με δεδομένα\n")
                 }
             }
 
