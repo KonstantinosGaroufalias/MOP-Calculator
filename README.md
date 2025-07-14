@@ -1,6 +1,3 @@
-Generated text
-MOP Calculator: A Comprehensive Production Tracking App for Greek Manufacturing Environments
-
 MOP Calculator is a modern Android application designed for tracking and analyzing production efficiency in Greek manufacturing environments. The app calculates Μ.Ο.Π. (Μέσος Όρος Παραγωγής) - Mean Output Production - by tracking daily production quantities and working hours across different shifts.
 
 ---
