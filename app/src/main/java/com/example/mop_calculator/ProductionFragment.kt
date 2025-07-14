@@ -12,6 +12,8 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.example.mop_calculator.AnimationUtils.bounceClick
+import com.example.mop_calculator.AnimationUtils.successFlash
 import java.time.LocalDate
 
 class ProductionFragment : Fragment() {
@@ -74,6 +76,9 @@ class ProductionFragment : Fragment() {
 
         // Save button click listener
         saveBtn.setOnClickListener {
+            // Add bounce animation
+            it.bounceClick()
+
             Log.d("ProductionFragment", "Save button clicked")
 
             val morning = morningInput.text.toString().toIntOrNull() ?: 0
@@ -85,12 +90,13 @@ class ProductionFragment : Fragment() {
             val night = nightInput.text.toString().toIntOrNull() ?: 0
             val nightHours = nightHoursInput.text.toString().toDoubleOrNull() ?: 0.0
 
-            Log.d("ProductionFragment", "Saving: Morning=$morning/${morningHours}h, Afternoon=$afternoon/${afternoonHours}h, Night=$night/${nightHours}h")
-
             // Save all shifts
             viewModel.saveShift(selectedDate, "ΠΡΩΙ", morning, morningHours)
             viewModel.saveShift(selectedDate, "ΑΠΟΓ", afternoon, afternoonHours)
             viewModel.saveShift(selectedDate, "ΒΡΑΔ", night, nightHours)
+
+            // Show success animation
+            saveBtn.successFlash()
 
             // Show confirmation
             Toast.makeText(context, "Αποθηκεύτηκε!", Toast.LENGTH_SHORT).show()

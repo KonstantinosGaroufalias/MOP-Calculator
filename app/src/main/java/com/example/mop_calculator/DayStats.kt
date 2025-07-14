@@ -9,5 +9,5 @@ data class DayStats(
     val nightHours: Double,
     val total: Int,
     val totalHours: Double,
-    val mop: Double  // production / hours
+    val mop: Double
 )

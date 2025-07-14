@@ -1,30 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@color/background"
     android:padding="16dp">
 
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/monthly_stats"
-        android:textColor="@color/onBackground"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:gravity="center"
-        android:layout_marginBottom="16dp" />
+        android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/statsText"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:text="Στατιστικά θα εμφανιστούν εδώ"
-        android:textColor="@color/onBackground"
-        android:textSize="16sp"
-        android:background="@color/surface"
-        android:padding="16dp" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/monthly_stats"
+            android:textColor="@color/onBackground"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginBottom="16dp" />
 
-</LinearLayout>
+        <CalendarView
+            android:id="@+id/calendarView"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:layout_marginBottom="16dp"
+            android:theme="@style/CustomCalendarTheme" />
+
+        <!-- NEW: Export Button -->
+        <Button
+            android:id="@+id/exportButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="📊 Εξαγωγή σε Excel"
+            android:backgroundTint="@color/primary"
+            android:textColor="@color/onPrimary"
+            android:layout_marginBottom="16dp" />
+
+        <TextView
+            android:id="@+id/statsText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Φόρτωση στατιστικών..."
+            android:textColor="@color/onBackground"
+            android:textSize="16sp"
+            android:background="@color/surface"
+            android:padding="16dp"
+            android:fontFamily="monospace"
+            android:lineSpacingExtra="4dp" />
+
+    </LinearLayout>
+
+</ScrollView>

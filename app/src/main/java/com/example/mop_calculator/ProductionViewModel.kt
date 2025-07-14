@@ -84,6 +84,10 @@ class ProductionViewModel(
                 Log.d("ProductionViewModel", "Posted stats: $stats")
                 dayLive.postValue(stats)
 
+                // Auto-load month data when day changes
+                val yearMonth = date.format(DateTimeFormatter.ofPattern("yyyy-MM"))
+                loadMonth(yearMonth)
+
             } catch (e: Exception) {
                 Log.e("ProductionViewModel", "Error loading day", e)
                 dayLive.postValue(
@@ -131,7 +135,14 @@ class ProductionViewModel(
                 val shifts = dao.getMonthShifts(yearMonth, type)
                 val dailyData = mutableMapOf<String, Pair<Int, Double>>()
 
+                // Calculate total monthly production and hours
+                var totalMonthlyProduction = 0
+                var totalMonthlyHours = 0.0
+
                 shifts.forEach { shift ->
+                    totalMonthlyProduction += shift.quantity
+                    totalMonthlyHours += shift.hours
+
                     val current = dailyData[shift.date] ?: Pair(0, 0.0)
                     dailyData[shift.date] = Pair(
                         current.first + shift.quantity,
@@ -144,10 +155,17 @@ class ProductionViewModel(
                 }
                 val monthMOP = if (dailyMOP.isNotEmpty()) dailyMOP.average() else 0.0
 
-                monthLive.postValue(MonthStats(dailyMOP, monthMOP))
+                monthLive.postValue(
+                    MonthStats(
+                        dailyMOP = dailyMOP,
+                        monthMOP = monthMOP,
+                        totalMonthlyProduction = totalMonthlyProduction,
+                        totalMonthlyHours = totalMonthlyHours
+                    )
+                )
             } catch (e: Exception) {
                 Log.e("ProductionViewModel", "Error loading month", e)
-                monthLive.postValue(MonthStats(emptyList(), 0.0))
+                monthLive.postValue(MonthStats(emptyList(), 0.0, 0, 0.0))
             }
         }
     }
